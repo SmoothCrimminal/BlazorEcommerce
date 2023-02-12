@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using BlazorEcommerce.Server.Data;
 using Microsoft.AspNetCore.ResponseCompression;
 using BlazorEcommerce.Server.Services.Product;
+using BlazorEcommerce.Server.Services.Category;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddDbContext<DataContext>(opt =>
 });
 
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();

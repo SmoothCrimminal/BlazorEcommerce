@@ -34,5 +34,15 @@ namespace BlazorEcommerce.Server.Services.Product
                 Data = await _dbContext.Products.ToListAsync()
             };
         }
+
+        public async Task<ServiceResponse<List<Shared.Product>>> GetProductsByCategory(string categoryUrl)
+        {
+            var res = _dbContext.Products.Include(x => x.Category).ToList().Where(x => x.Category.Url.Equals(categoryUrl, StringComparison.InvariantCultureIgnoreCase));
+
+            return new ServiceResponse<List<Shared.Product>>()
+            {
+                Data = res.ToList()
+            };
+        }
     }
 }

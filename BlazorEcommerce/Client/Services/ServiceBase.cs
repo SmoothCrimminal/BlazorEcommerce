@@ -1,10 +1,10 @@
 ﻿namespace BlazorEcommerce.Client.Services
 {
-    public abstract class BaseService
+    public abstract class ServiceBase
     {
         internal readonly HttpClient _httpClient;
 
-        public BaseService(HttpClient httpClient)
+        public ServiceBase(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }

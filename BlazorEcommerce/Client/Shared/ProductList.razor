@@ -1,6 +1,8 @@
 ﻿@inject HttpClient _httpClient
 @inject IProductService _productService;
 
+@implements IDisposable
+
 @if (_productService.Products is null || _productService.Products.Count <= 0)
 {
     <span>Loading products...</span>
@@ -31,8 +33,13 @@ else
 
 
 @code {
-    protected async override Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await _productService.GetProducts();
+        _productService.ProductsChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        _productService.ProductsChanged -= StateHasChanged;
     }
 }
