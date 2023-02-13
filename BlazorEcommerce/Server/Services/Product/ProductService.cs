@@ -11,7 +11,8 @@ namespace BlazorEcommerce.Server.Services.Product
         public async Task<ServiceResponse<Shared.Product>> GetProduct(int id)
         {
             var response = new ServiceResponse<Shared.Product>();
-            var product = await _dbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
+            var product = await _dbContext.Products.Include(x => x.Variants).ThenInclude(v => v.ProductType)
+                                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (product is null) 
             {
@@ -31,17 +32,69 @@ namespace BlazorEcommerce.Server.Services.Product
         {
             return new ServiceResponse<List<Shared.Product>>()
             {
-                Data = await _dbContext.Products.ToListAsync()
+                Data = await _dbContext.Products.Include(x => x.Variants).ThenInclude(v => v.ProductType).ToListAsync()
             };
         }
 
         public async Task<ServiceResponse<List<Shared.Product>>> GetProductsByCategory(string categoryUrl)
         {
-            var res = _dbContext.Products.Include(x => x.Category).ToList().Where(x => x.Category.Url.Equals(categoryUrl, StringComparison.InvariantCultureIgnoreCase));
+            var res = _dbContext.Products.Include(x => x.Category).Include(x => x.Variants).ThenInclude(v => v.ProductType)
+                                            .ToList().Where(x => x.Category.Url.Equals(categoryUrl, StringComparison.InvariantCultureIgnoreCase));
+                                                                           
 
             return new ServiceResponse<List<Shared.Product>>()
             {
                 Data = res.ToList()
+            };
+        }
+
+        public async Task<ServiceResponse<List<string>>> GetProductSerachSuggestions(string searchText)
+        {
+            var searchedProducts = _dbContext.Products.Include(x => x.Variants).ThenInclude(v => v.ProductType).ToList()
+                                                     .Where(x =>
+                                                      x.Title.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) ||
+                                                      x.Description.Contains(searchText, StringComparison.InvariantCultureIgnoreCase));
+
+            var results = new List<string>();
+
+            foreach (var product in searchedProducts)
+            {
+                if (product.Title.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    results.Add(product.Title);
+                }
+
+                if (product.Description is not null)
+                {
+                    var punctuation = product.Description.Where(char.IsPunctuation)
+                        .Distinct().ToArray();
+                    var words = product.Description.Split()
+                        .Select(s => s.Trim(punctuation));
+
+                    foreach (var word in words)
+                    {
+                        if (word.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) && !results.Contains(word))
+                        {
+                            results.Add(word);
+                        }
+                    }
+                }
+            }
+
+            return new ServiceResponse<List<string>> { Data = results };
+        }
+
+        public async Task<ServiceResponse<List<Shared.Product>>> SearchProducts(string searchText)
+        {
+            var searchedProducts = _dbContext.Products.Include(x => x.Variants).ThenInclude(v => v.ProductType).ToList()
+                                                      .Where(x =>
+                                                       x.Title.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) ||
+                                                       x.Description.Contains(searchText, StringComparison.InvariantCultureIgnoreCase));
+
+
+            return new ServiceResponse<List<Shared.Product>>()
+            {
+                Data = searchedProducts.ToList()
             };
         }
     }
