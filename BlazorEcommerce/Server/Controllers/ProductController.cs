@@ -1,5 +1,6 @@
 ﻿using BlazorEcommerce.Server.Data;
 using BlazorEcommerce.Server.Services.Product;
+using BlazorEcommerce.Shared.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorEcommerce.Server.Controllers
@@ -36,10 +37,10 @@ namespace BlazorEcommerce.Server.Controllers
             return Ok(products);
         }
 
-        [HttpGet("search/{searchText}")]
-        public async Task<ActionResult<ServiceResponse<List<Product>>>> SearchProducts(string searchText)
+        [HttpGet("search/{searchText}/{page}")]
+        public async Task<ActionResult<ServiceResponse<ProductSearchResultDto>>> SearchProducts(string searchText, int page)
         {
-            var products = await _productService.SearchProducts(searchText);
+            var products = await _productService.SearchProducts(searchText, page);
             return Ok(products);
         }
 
@@ -48,6 +49,13 @@ namespace BlazorEcommerce.Server.Controllers
         {
             var suggestions = await _productService.GetProductSerachSuggestions(searchText);
             return Ok(suggestions);
+        }
+
+        [HttpGet("featured")]
+        public async Task<ActionResult<ServiceResponse<List<string>>>> GetFeaturedProducts()
+        {
+            var products = await _productService.GetFeaturedProducts();
+            return Ok(products);
         }
     }
 }

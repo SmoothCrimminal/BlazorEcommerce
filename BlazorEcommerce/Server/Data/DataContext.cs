@@ -55,7 +55,8 @@ namespace BlazorEcommerce.Server.Data
                     Title = "Naruto Shippuden: Ultimate Ninja Storm 3",
                     Description = "Naruto Shippuden: Ultimate Ninja Storm 3, known in Japan as Naruto Shippūden: Narutimate Storm 3 (Japanese: NARUTOナルト 疾風伝 ナルティメットストーム3, Hepburn: Naruto Shippūden: Narutimetto Sutōmu 3), the fourth installment of the UltimateStorm series, is a fighting game developed by CyberConnect2 as part of the Naruto: Ultimate Ninja video-game series based on Masashi Kishimoto's Naruto manga. It was first released for PlayStation 3 and Xbox 360 by Namco Bandai Games on March 2013 in North America and in Europe, and on April 2013 in Japan.",
                     ImageUrl = "https://upload.wikimedia.org/wikipedia/en/5/57/Naruto_Shippuden_UNS_3_box_art.png",
-                    CategoryId = 3
+                    CategoryId = 3,
+                    Featured = true
                 },
                 new Product()
                 {
@@ -88,6 +89,7 @@ namespace BlazorEcommerce.Server.Data
                     Title = "Back to the Future",
                     Description = "Back to the Future is a 1985 American science fiction film directed by Robert Zemeckis. Written by Zemeckis and Bob Gale, it stars Michael J. Fox, Christopher Lloyd, Lea Thompson, Crispin Glover, and Thomas F. Wilson. Set in 1985, the story follows Marty McFly (Fox), a teenager accidentally sent back to 1955 in a time-traveling DeLorean automobile built by his eccentric scientist friend Doctor Emmett \"Doc\" Brown (Lloyd). Trapped in the past, Marty inadvertently prevents his future parents' meeting—threatening his very existence—and is forced to reconcile the pair and somehow get back to the future.",
                     ImageUrl = "https://upload.wikimedia.org/wikipedia/en/d/d2/Back_to_the_Future.jpg",
+                    Featured = true
                 },
                 new Product
                 {
@@ -122,6 +124,7 @@ namespace BlazorEcommerce.Server.Data
                     Title = "Day of the Tentacle",
                     Description = "Day of the Tentacle, also known as Maniac Mansion II: Day of the Tentacle, is a 1993 graphic adventure game developed and published by LucasArts. It is the sequel to the 1987 game Maniac Mansion.",
                     ImageUrl = "https://upload.wikimedia.org/wikipedia/en/7/79/Day_of_the_Tentacle_artwork.jpg",
+                    Featured = true
                 },
                 new Product
                 {

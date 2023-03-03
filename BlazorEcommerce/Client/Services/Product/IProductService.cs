@@ -7,9 +7,12 @@ namespace BlazorEcommerce.Client.Services.Product
         event Action ProductsChanged;
         List<BlazorEcommerce.Shared.Product> Products { get; set; }
         public string Message { get; set; }
+        int CurrentPage { get; set; }
+        public int PageCount { get; set; }
+        public string LastSearchText { get; set; }
         Task GetProducts(string? categoryUrl = null);
         Task<ServiceResponse<BlazorEcommerce.Shared.Product>> GetProduct(int id);
-        Task SearchProducts(string searchText);
+        Task SearchProducts(string searchText, int page);
         Task<List<string>> GetProductSearchSuggestions(string searchText);
     }
 }

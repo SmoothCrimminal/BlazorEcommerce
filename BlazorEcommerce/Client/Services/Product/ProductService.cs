@@ -1,4 +1,5 @@
 ﻿using BlazorEcommerce.Shared;
+using BlazorEcommerce.Shared.Dtos;
 using System.Net.Http.Json;
 
 namespace BlazorEcommerce.Client.Services.Product
@@ -7,6 +8,9 @@ namespace BlazorEcommerce.Client.Services.Product
     {
         public List<BlazorEcommerce.Shared.Product> Products { get; set; } = new List<BlazorEcommerce.Shared.Product>();
         public string Message { get; set; } = "Loading products...";
+        public int CurrentPage { get; set; } = 1;
+        public int PageCount { get; set; } = 0;
+        public string LastSearchText { get; set; } = string.Empty;
 
         public event Action ProductsChanged;
 
@@ -22,21 +26,32 @@ namespace BlazorEcommerce.Client.Services.Product
 
         public async Task GetProducts(string? categoryUrl)
         {
-            var url = categoryUrl is null ? "api/product" : $"api/product/category/{categoryUrl}";
+            var url = categoryUrl is null ? "api/product/featured" : $"api/product/category/{categoryUrl}";
             var res = await _httpClient.GetFromJsonAsync<ServiceResponse<List<BlazorEcommerce.Shared.Product>>>(url);
 
             if (res is not null && res.IsSuccess)
                 Products = res.Data;
 
+            CurrentPage = 1;
+            PageCount = 0;
+
+            if (Products?.Count <= 0)
+                Message = "No products found";
+
             ProductsChanged.Invoke();
         }
 
-        public async Task SearchProducts(string searchText)
+        public async Task SearchProducts(string searchText, int page)
         {
-            var result = await _httpClient.GetFromJsonAsync<ServiceResponse<List<BlazorEcommerce.Shared.Product>>>($"api/product/search/{searchText}");
+            LastSearchText = searchText;
+            var result = await _httpClient.GetFromJsonAsync<ServiceResponse<ProductSearchResultDto>>($"api/product/search/{searchText}/{page}");
 
             if (result is not null && result.Data is not null)
-                Products = result.Data;
+            {
+                Products = result.Data.Products;
+                CurrentPage = result.Data.CurrentPage;
+                PageCount = result.Data.Pages;
+            }
 
             if (Products.Count == 0)
                 Message = "No products found.";
