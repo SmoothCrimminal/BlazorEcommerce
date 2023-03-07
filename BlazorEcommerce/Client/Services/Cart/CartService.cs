@@ -5,17 +5,15 @@ using System.Net.Http.Json;
 
 namespace BlazorEcommerce.Client.Services.Cart
 {
-    public class CartService : ICartService
+    public class CartService : ServiceBase, ICartService
     {
         private readonly ILocalStorageService _localStorageService;
-        private readonly HttpClient _httpClient;
 
         public event Action OnChange;
 
-        public CartService(ILocalStorageService localStorageService, HttpClient httpClient)
+        public CartService(ILocalStorageService localStorageService, HttpClient httpClient) : base(httpClient)
         {
             _localStorageService = localStorageService;
-            _httpClient = httpClient;
         }
 
         public async Task AddToCart(CartItem cartItem)
