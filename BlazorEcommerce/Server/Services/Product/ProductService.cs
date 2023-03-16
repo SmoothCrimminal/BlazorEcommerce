@@ -5,7 +5,7 @@ namespace BlazorEcommerce.Server.Services.Product
 {
     public class ProductService : ServiceBase, IProductService
     {
-        public ProductService(DataContext dbContext) : base(dbContext)
+        public ProductService(DataContext dbContext, IHttpContextAccessor httpContextAccessor) : base(dbContext, httpContextAccessor)
         {
         }
 

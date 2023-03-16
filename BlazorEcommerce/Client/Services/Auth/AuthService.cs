@@ -1,13 +1,19 @@
 ﻿using BlazorEcommerce.Shared;
+using Microsoft.AspNetCore.Components.Authorization;
 using System.Net.Http.Json;
 
 namespace BlazorEcommerce.Client.Services.Auth
 {
     public class AuthService : ServiceBase, IAuthService
     {
-        public AuthService(HttpClient httpClient) : base(httpClient)
+        private readonly AuthenticationStateProvider _authStateProvider;
+
+        public AuthService(HttpClient httpClient, AuthenticationStateProvider authStateProvider) : base(httpClient)
         {
+            _authStateProvider = authStateProvider;
         }
+
+        public async Task<bool> IsUserAuthenticated() => (await _authStateProvider.GetAuthenticationStateAsync()).User.Identity.IsAuthenticated;
 
         public async Task<ServiceResponse<bool>> ChangePassword(UserChangePassword request)
         {

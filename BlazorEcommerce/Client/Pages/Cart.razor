@@ -1,17 +1,22 @@
 ﻿@page "/cart"
 @inject ICartService _cartService
+@inject IOrderService _orderService
 
 <PageTitle>Shopping Cart</PageTitle>
 <h3>Shopping Cart</h3>
 
-@if (cartProducts is null || cartProducts.Count == 0) 
+@if (_cartProducts is null || _cartProducts.Count == 0) 
 {
-    <span>@message</span>
+    <span>@_message</span>
+}
+else if (_orderPlaced)
+{
+    <span>Thank You for Your odrder! You chan check yout order <a href="orders">here</a>.</span>
 }
 else
 {
     <div>
-        @foreach (var product in cartProducts)
+        @foreach (var product in _cartProducts)
         {
             <div class="container">
                 <div class="image-wrapper">
@@ -29,17 +34,20 @@ else
             </div>
         }
         <div class="cart-product-price">
-            Total (@cartProducts.Count): $@cartProducts.Sum(p => p.Price * p.Quantity)
+            Total (@_cartProducts.Count): $@_cartProducts.Sum(p => p.Price * p.Quantity)
         </div>
     </div>
+    <button @onclick="PlaceOrder" class="btn alert-success float-end mt-1">Place Order</button>
 }
 
 @code {
-    List<BlazorEcommerce.Shared.Dtos.CartProductDto> cartProducts = null;
-    string message = "Loading cart...";
+    List<BlazorEcommerce.Shared.Dtos.CartProductDto> _cartProducts = null;
+    string _message = "Loading cart...";
+    bool _orderPlaced = false;
 
     protected override async Task OnInitializedAsync()
     {
+        _orderPlaced = false;
         await LoadCart();
     }
 
@@ -51,14 +59,12 @@ else
 
     private async Task LoadCart()
     {
-        if ((await _cartService.GetCartItems()).Count == 0)
+        await _cartService.GetCartItemsCount();
+        _cartProducts = await _cartService.GetCartProducts();
+
+        if (_cartProducts is null || _cartProducts.Count == 0)
         {
-            message = "Your cart is empty.";
-            cartProducts = new List<BlazorEcommerce.Shared.Dtos.CartProductDto>();
-        }
-        else
-        {
-            cartProducts = await _cartService.GetCartProducts();
+            _message = "Your cart is empty.";
         }
     }
 
@@ -73,5 +79,12 @@ else
             product.Quantity = 1;
 
         await _cartService.UpdateQuantity(product);
+    }
+
+    private async Task PlaceOrder()
+    {
+        await _orderService.PlaceOrder();
+        await _cartService.GetCartItemsCount();
+        _orderPlaced = true;
     }
 }

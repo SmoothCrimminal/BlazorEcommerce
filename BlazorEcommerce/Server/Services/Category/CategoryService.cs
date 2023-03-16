@@ -4,7 +4,7 @@ namespace BlazorEcommerce.Server.Services.Category
 {
     public class CategoryService : ServiceBase, ICategoryService
     {
-        public CategoryService(DataContext dbContext) : base(dbContext)
+        public CategoryService(DataContext dbContext, IHttpContextAccessor httpContextAccessor) : base(dbContext, httpContextAccessor)
         {
         }
 

@@ -10,7 +10,7 @@ namespace BlazorEcommerce.Server.Services.AuthService
     {
         private readonly IConfiguration _configuration;
 
-        public AuthService(DataContext dbContext, IConfiguration configuration) : base(dbContext)
+        public AuthService(DataContext dbContext, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : base(dbContext, httpContextAccessor)
         {
             _configuration = configuration;
         }
