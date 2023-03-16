@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
-namespace BlazorEcommerce.Server.Services.AuthService
+namespace BlazorEcommerce.Server.Services.Auth
 {
     public class AuthService : ServiceBase, IAuthService
     {
@@ -131,5 +131,7 @@ namespace BlazorEcommerce.Server.Services.AuthService
                 Message = "Password has been changed"
             };
         }
+
+        public Task<User> GetUserByEmail(string email) => _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email);
     }
 }

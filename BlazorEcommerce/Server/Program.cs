@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.ResponseCompression;
 using BlazorEcommerce.Server.Services.Product;
 using BlazorEcommerce.Server.Services.Category;
 using BlazorEcommerce.Server.Services.Cart;
-using BlazorEcommerce.Server.Services.AuthService;
+using BlazorEcommerce.Server.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using BlazorEcommerce.Server.Services.Order;
+using BlazorEcommerce.Server.Services.Payment;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {

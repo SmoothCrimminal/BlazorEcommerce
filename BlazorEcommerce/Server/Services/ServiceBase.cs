@@ -15,5 +15,7 @@ namespace BlazorEcommerce.Server.Services
         }
 
         protected int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+        protected string GetUserEmailAddress() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
     }
 }

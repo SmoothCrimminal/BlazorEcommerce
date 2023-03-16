@@ -1,6 +1,7 @@
 ﻿@page "/cart"
 @inject ICartService _cartService
 @inject IOrderService _orderService
+@inject NavigationManager _navigationManager
 
 <PageTitle>Shopping Cart</PageTitle>
 <h3>Shopping Cart</h3>
@@ -8,10 +9,6 @@
 @if (_cartProducts is null || _cartProducts.Count == 0) 
 {
     <span>@_message</span>
-}
-else if (_orderPlaced)
-{
-    <span>Thank You for Your odrder! You chan check yout order <a href="orders">here</a>.</span>
 }
 else
 {
@@ -37,17 +34,15 @@ else
             Total (@_cartProducts.Count): $@_cartProducts.Sum(p => p.Price * p.Quantity)
         </div>
     </div>
-    <button @onclick="PlaceOrder" class="btn alert-success float-end mt-1">Place Order</button>
+    <button @onclick="PlaceOrder" class="btn alert-success float-end mt-1">Checkout</button>
 }
 
 @code {
     List<BlazorEcommerce.Shared.Dtos.CartProductDto> _cartProducts = null;
     string _message = "Loading cart...";
-    bool _orderPlaced = false;
 
     protected override async Task OnInitializedAsync()
     {
-        _orderPlaced = false;
         await LoadCart();
     }
 
@@ -83,8 +78,7 @@ else
 
     private async Task PlaceOrder()
     {
-        await _orderService.PlaceOrder();
-        await _cartService.GetCartItemsCount();
-        _orderPlaced = true;
+        var url = await _orderService.PlaceOrder();
+        _navigationManager.NavigateTo(url);
     }
 }

@@ -1,4 +1,5 @@
-﻿using BlazorEcommerce.Shared;
+﻿using BlazorEcommerce.Client.Services.Auth;
+using BlazorEcommerce.Shared;
 using BlazorEcommerce.Shared.Dtos;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -8,26 +9,26 @@ namespace BlazorEcommerce.Client.Services.Order
 {
     public class OrderService : ServiceBase, IOrderService
     {
-        private readonly AuthenticationStateProvider _authStateProvider;
+        private readonly IAuthService _authService;
         private readonly NavigationManager _navigationManager;
 
-        public OrderService(HttpClient httpClient, AuthenticationStateProvider authenticationStateProvider, NavigationManager navigationManager) : base(httpClient)
+        public OrderService(HttpClient httpClient, IAuthService authService, NavigationManager navigationManager) : base(httpClient)
         {
-            _authStateProvider = authenticationStateProvider;
+            _authService = authService;
             _navigationManager = navigationManager;
         }
 
-        private async Task<bool> IsUserAuthenticated() => (await _authStateProvider.GetAuthenticationStateAsync()).User.Identity.IsAuthenticated;
-
-        public async Task PlaceOrder()
+        public async Task<string> PlaceOrder()
         {
-            if (await IsUserAuthenticated())
+            if (await _authService.IsUserAuthenticated())
             {
-                await _httpClient.PostAsync("api/order", null);
+                var res = await _httpClient.PostAsync("api/payment/checkout", null);
+                var url = await res.Content.ReadAsStringAsync();
+                return url;
             }
             else
             {
-                _navigationManager.NavigateTo("login");
+                return "login";
             }
         }
 

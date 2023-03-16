@@ -14,9 +14,9 @@ namespace BlazorEcommerce.Server.Services.Order
             _cartService = cartService;
         }
 
-        public async Task<ServiceResponse<bool>> PlaceOrder()
+        public async Task<ServiceResponse<bool>> PlaceOrder(int userId)
         {
-            var products = (await _cartService.GetDbCartProducts()).Data;
+            var products = (await _cartService.GetDbCartProducts(userId)).Data;
             var totalPrice = decimal.Zero;
 
             products.ForEach(p => totalPrice += p.Price * p.Quantity);
@@ -32,7 +32,7 @@ namespace BlazorEcommerce.Server.Services.Order
 
             var order = new BlazorEcommerce.Shared.Order
             {
-                UserId = GetUserId(),
+                UserId = userId,
                 OrderDate = DateTime.UtcNow,
                 TotalPrice = totalPrice,
                 OrderItems = orderItems
@@ -40,7 +40,7 @@ namespace BlazorEcommerce.Server.Services.Order
 
             _dbContext.Orders.Add(order);
 
-            _dbContext.CartItems.RemoveRange(_dbContext.CartItems.Where(ci => ci.UserId == GetUserId()));
+            _dbContext.CartItems.RemoveRange(_dbContext.CartItems.Where(ci => ci.UserId == userId));
             await _dbContext.SaveChangesAsync();
 
             return new ServiceResponse<bool> { Data = true };
