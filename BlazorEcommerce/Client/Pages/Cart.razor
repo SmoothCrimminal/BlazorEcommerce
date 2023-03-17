@@ -1,6 +1,7 @@
 ﻿@page "/cart"
 @inject ICartService _cartService
 @inject IOrderService _orderService
+@inject IAuthService _authService
 @inject NavigationManager _navigationManager
 
 <PageTitle>Shopping Cart</PageTitle>
@@ -34,15 +35,24 @@ else
             Total (@_cartProducts.Count): $@_cartProducts.Sum(p => p.Price * p.Quantity)
         </div>
     </div>
+    @if (_isAuthenticated)
+    {
+        <div>
+            <h5>Delivery Address</h5>
+            <AddressForm />
+        </div>
+    }
     <button @onclick="PlaceOrder" class="btn alert-success float-end mt-1">Checkout</button>
 }
 
 @code {
     List<BlazorEcommerce.Shared.Dtos.CartProductDto> _cartProducts = null;
     string _message = "Loading cart...";
+    bool _isAuthenticated = false;
 
     protected override async Task OnInitializedAsync()
     {
+        _isAuthenticated = await _authService.IsUserAuthenticated();
         await LoadCart();
     }
 
