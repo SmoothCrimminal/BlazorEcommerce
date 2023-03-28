@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using BlazorEcommerce.Server.Services.Order;
 using BlazorEcommerce.Server.Services.Payment;
 using BlazorEcommerce.Server.Services.Address;
+using BlazorEcommerce.Server.Services.ProductType;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IProductTypeService, ProductTypeService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {

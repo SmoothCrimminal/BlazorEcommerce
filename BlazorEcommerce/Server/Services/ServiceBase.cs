@@ -6,7 +6,7 @@ namespace BlazorEcommerce.Server.Services
     public abstract class ServiceBase
     {
         internal readonly DataContext _dbContext;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        internal readonly IHttpContextAccessor _httpContextAccessor;
 
         public ServiceBase(DataContext dbContext, IHttpContextAccessor httpContextAccessor)
         {

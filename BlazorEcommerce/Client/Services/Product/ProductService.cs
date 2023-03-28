@@ -11,6 +11,7 @@ namespace BlazorEcommerce.Client.Services.Product
         public int CurrentPage { get; set; } = 1;
         public int PageCount { get; set; } = 0;
         public string LastSearchText { get; set; } = string.Empty;
+        public List<BlazorEcommerce.Shared.Product> AdminProducts { get; set; }
 
         public event Action ProductsChanged;
 
@@ -64,6 +65,40 @@ namespace BlazorEcommerce.Client.Services.Product
             var result = await _httpClient.GetFromJsonAsync<ServiceResponse<List<string>>>($"api/product/search-suggestions/{searchText}");
 
             return result.Data;
+        }
+
+        public async Task GetAdminProducts()
+        {
+            var res = await _httpClient.GetFromJsonAsync<ServiceResponse<List<BlazorEcommerce.Shared.Product>>>("api/product/admin");
+
+            AdminProducts = res.Data;
+            CurrentPage = 1;
+            PageCount = 0;
+
+            if (AdminProducts.Count == 0)
+                Message = "No products found.";
+        }
+
+        public async Task<BlazorEcommerce.Shared.Product> CreateProduct(BlazorEcommerce.Shared.Product product)
+        {
+            var res = await _httpClient.PostAsJsonAsync("api/product", product);
+            var newProduct = (await res.Content.ReadFromJsonAsync<ServiceResponse<BlazorEcommerce.Shared.Product>>()).Data;
+
+            return newProduct;
+        }
+
+        public async Task<BlazorEcommerce.Shared.Product> UpdateProduct(BlazorEcommerce.Shared.Product product)
+        {
+            var result = await _httpClient.PutAsJsonAsync("api/product", product);
+
+            var newProduct = (await result.Content.ReadFromJsonAsync<ServiceResponse<BlazorEcommerce.Shared.Product>>()).Data;
+
+            return newProduct;
+        }
+
+        public async Task DeleteProduct(BlazorEcommerce.Shared.Product product)
+        {
+            await _httpClient.DeleteAsync($"api/product/{product.Id}");
         }
     }
 }
