@@ -17,12 +17,14 @@ namespace BlazorEcommerce.Server.Services.Product
             if (_httpContextAccessor.HttpContext.User.IsInRole("Admin"))
             {
                 product = await _dbContext.Products.Include(x => x.Variants.Where(v => !v.Deleted)).ThenInclude(v => v.ProductType)
+                                .Include(p => p.Images)
                                 .FirstOrDefaultAsync(x => x.Id == id && !x.Deleted);
 
             }
             else
             {
                 product = await _dbContext.Products.Include(x => x.Variants.Where(v => v.Visible && !v.Deleted)).ThenInclude(v => v.ProductType)
+                                                .Include(p => p.Images)
                                                 .FirstOrDefaultAsync(x => x.Id == id && x.Visible && !x.Deleted);
             }
 
@@ -46,13 +48,14 @@ namespace BlazorEcommerce.Server.Services.Product
             {
                 Data = await _dbContext.Products
                 .Where(p => p.Visible && !p.Deleted)
-                .Include(x => x.Variants.Where(v => v.Visible && !v.Deleted)).ThenInclude(v => v.ProductType).ToListAsync()
+                .Include(x => x.Variants.Where(v => v.Visible && !v.Deleted)).ThenInclude(v => v.ProductType).Include(p => p.Images).ToListAsync()
             };
         }
 
         public async Task<ServiceResponse<List<Shared.Product>>> GetProductsByCategory(string categoryUrl)
         {
             var res = _dbContext.Products.Include(x => x.Category).Include(x => x.Variants.Where(v => v.Visible && !v.Deleted)).ThenInclude(v => v.ProductType)
+                                            .Include(p => p.Images)
                                             .ToList().Where(x => x.Category.Url.Equals(categoryUrl, StringComparison.InvariantCultureIgnoreCase)
                                             && x.Visible && !x.Deleted);
                                                                            
@@ -103,7 +106,7 @@ namespace BlazorEcommerce.Server.Services.Product
         public async Task<ServiceResponse<ProductSearchResultDto>> SearchProducts(string searchText, int page)
         {
 
-            var searchedProducts = _dbContext.Products.Include(x => x.Variants.Where(v => v.Visible && !v.Deleted)).ThenInclude(v => v.ProductType).ToList()
+            var searchedProducts = _dbContext.Products.Include(x => x.Variants.Where(v => v.Visible && !v.Deleted)).ThenInclude(v => v.ProductType).Include(p => p.Images).ToList()
                                                       .Where(x =>
                                                        x.Title.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) ||
                                                        x.Description.Contains(searchText, StringComparison.InvariantCultureIgnoreCase) 
@@ -132,7 +135,7 @@ namespace BlazorEcommerce.Server.Services.Product
             return new ServiceResponse<List<Shared.Product>>()
             {
                 Data = await _dbContext.Products.Where(x => x.Featured && x.Visible && !x.Deleted)
-                .Include(p => p.Variants.Where(v => v.Visible && !v.Deleted)).ToListAsync()
+                .Include(p => p.Variants.Where(v => v.Visible && !v.Deleted)).Include(p => p.Images).ToListAsync()
             };
         }
 
@@ -142,7 +145,8 @@ namespace BlazorEcommerce.Server.Services.Product
             {
                 Data = await _dbContext.Products
                 .Where(p => !p.Deleted)
-                .Include(x => x.Variants.Where(v => !v.Deleted)).ThenInclude(v => v.ProductType).ToListAsync()
+                .Include(x => x.Variants.Where(v => !v.Deleted)).ThenInclude(v => v.ProductType)
+                .Include(p => p.Images).ToListAsync()
             };
         }
 
@@ -161,7 +165,8 @@ namespace BlazorEcommerce.Server.Services.Product
 
         public async Task<ServiceResponse<Shared.Product>> UpdateProduct(Shared.Product product)
         {
-            var dbProduct = await _dbContext.Products.FindAsync(product.Id);
+            var dbProduct = await _dbContext.Products.Include(p => p.Images)
+                                                    .FirstOrDefaultAsync(p => p.Id == product.Id);
             if (dbProduct is null)
             {
                 return new ServiceResponse<Shared.Product> { IsSuccess = false, Message = "Product not found" };
@@ -173,6 +178,11 @@ namespace BlazorEcommerce.Server.Services.Product
             dbProduct.CategoryId = product.CategoryId;
             dbProduct.Visible = product.Visible;
             dbProduct.Featured = product.Featured;
+
+            var productImages = dbProduct.Images;
+            _dbContext.Images.RemoveRange(productImages);
+
+            dbProduct.Images = product.Images;
 
             foreach (var variant in product.Variants)
             {
